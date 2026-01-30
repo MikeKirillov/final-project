@@ -32,7 +32,7 @@ func Init(dbFile string) error {
 	if install == true {
 		fmt.Println("Creating new schema")
 
-		db, err := openDb(dbFile)
+		db, err := sql.Open("sqlite", dbFile)
 		_, err = db.Exec(schema)
 		if err != nil {
 			fmt.Println(err)
@@ -44,7 +44,7 @@ func Init(dbFile string) error {
 	} else {
 		fmt.Println("Opening an existing schema")
 
-		db, err := openDb(dbFile)
+		db, err := sql.Open("sqlite", dbFile)
 		if err != nil {
 			fmt.Println(err)
 			return err
@@ -54,10 +54,4 @@ func Init(dbFile string) error {
 	}
 
 	return nil
-}
-
-func openDb(dbFile string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite", dbFile)
-
-	return db, err
 }
