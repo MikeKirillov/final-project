@@ -29,28 +29,23 @@ func Init(dbFile string) error {
 		install = true
 	}
 
+	db, err := sql.Open("sqlite", dbFile)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	defer db.Close()
+
 	if install == true {
 		fmt.Println("Creating new schema")
 
-		db, err := sql.Open("sqlite", dbFile)
 		_, err = db.Exec(schema)
 		if err != nil {
 			fmt.Println(err)
 			return err
 		}
-		defer db.Close()
 
 		fmt.Println("Table 'scheduler' created successfully (if it did not already exist)")
-	} else {
-		fmt.Println("Opening an existing schema")
-
-		db, err := sql.Open("sqlite", dbFile)
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
-		defer db.Close()
-		fmt.Println("DB is opened")
 	}
 
 	return nil
