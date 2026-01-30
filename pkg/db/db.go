@@ -18,6 +18,8 @@ CREATE TABLE scheduler (
 );
 CREATE INDEX scheduler_date ON scheduler (date);`
 
+var db *sql.DB
+
 func Init(dbFile string) error {
 	fmt.Println("DB initialization")
 
@@ -29,7 +31,7 @@ func Init(dbFile string) error {
 		install = true
 	}
 
-	db, err := sql.Open("sqlite", dbFile)
+	db, err = sql.Open("sqlite", dbFile)
 	if err != nil {
 		fmt.Println(err)
 		return err
