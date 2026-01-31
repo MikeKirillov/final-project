@@ -1,6 +1,7 @@
 package main
 
 import (
+	"final-project/pkg/api"
 	"final-project/pkg/db"
 	"final-project/pkg/server"
 	"log"
@@ -13,5 +14,6 @@ func main() {
 		log.Fatal(err)
 	}
 
+	api.Init()
 	server.Start()
 }

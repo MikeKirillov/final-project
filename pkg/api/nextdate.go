@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"net/http"
 	"slices"
 	"strconv"
 	"strings"
@@ -11,7 +12,27 @@ import (
 const LAYOUT = "20060102"
 const DAYS_LIMIT = 400
 
-func NextDate(now time.Time, dstart string, repeat string) (string, error) {
+func nextDayHandler(w http.ResponseWriter, req *http.Request) {
+	now := req.FormValue("now")
+	date := req.FormValue("date")
+	repeat := req.FormValue("repeat")
+
+	dateNow, err := time.Parse(LAYOUT, now)
+	if err != nil {
+		http.Error(w, "the value 'now' parsing error "+req.RequestURI, http.StatusNotAcceptable)
+		return
+	}
+
+	result, err := nextDate(dateNow, date, repeat)
+	if err != nil {
+		http.Error(w, err.Error()+req.RequestURI, http.StatusNotAcceptable)
+		return
+	}
+
+	w.Write([]byte(result))
+}
+
+func nextDate(now time.Time, dstart string, repeat string) (string, error) {
 	// Split the 'repeat' value on slices.
 	// The 1st element is always a repeating type (y, d, m, w).
 	// The rest of the elements are values that are used depending on the repeating type
