@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"slices"
 	"strconv"
@@ -29,10 +28,6 @@ func nextDayHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error()+req.RequestURI, http.StatusNotAcceptable)
 		return
 	}
-	fmt.Println("now: " + now)
-	fmt.Println("date: " + date)
-	fmt.Println("repeat: " + repeat)
-	fmt.Println("result: " + result)
 
 	w.Write([]byte(result))
 }
