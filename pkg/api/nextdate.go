@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"slices"
 	"strconv"
@@ -23,16 +24,20 @@ func nextDayHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	result, err := nextDate(dateNow, date, repeat)
+	result, err := NextDate(dateNow, date, repeat)
 	if err != nil {
 		http.Error(w, err.Error()+req.RequestURI, http.StatusNotAcceptable)
 		return
 	}
+	fmt.Println("now: " + now)
+	fmt.Println("date: " + date)
+	fmt.Println("repeat: " + repeat)
+	fmt.Println("result: " + result)
 
 	w.Write([]byte(result))
 }
 
-func nextDate(now time.Time, dstart string, repeat string) (string, error) {
+func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	// Split the 'repeat' value on slices.
 	// The 1st element is always a repeating type (y, d, m, w).
 	// The rest of the elements are values that are used depending on the repeating type
@@ -54,7 +59,7 @@ func nextDate(now time.Time, dstart string, repeat string) (string, error) {
 			return "", err
 		}
 
-		increasedDate = date
+		increasedDate = date.AddDate(1, 0, 0)
 		// The returned date must be greater than the date specified in the 'now' variable.
 		// In simpler terms, when searching for the next date, you should start counting from
 		// 'dstart' and repeat intervals until the date becomes greater than 'now'
@@ -76,7 +81,7 @@ func nextDate(now time.Time, dstart string, repeat string) (string, error) {
 			return "", err
 		}
 
-		increasedDate = date
+		increasedDate = date.AddDate(0, 0, daysCount)
 		// same check for 'increasedDate < now'
 		for increasedDate.Before(now) {
 			increasedDate = increasedDate.AddDate(0, 0, daysCount)
