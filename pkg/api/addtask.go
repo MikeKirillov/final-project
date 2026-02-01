@@ -1,0 +1,110 @@
+package api
+
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"final-project/pkg/db"
+	"net/http"
+	"strconv"
+	"time"
+)
+
+type AddTaskRs struct {
+	Id string `json:"id"`
+}
+
+type ErrorRs struct {
+	Err string `json:"error"`
+}
+
+func addTaskHandler(w http.ResponseWriter, req *http.Request) {
+	var task db.Task
+	var addTaskRs AddTaskRs
+	var errorRs ErrorRs
+
+	readJson(w, req, &task)
+
+	if len(task.Title) == 0 {
+		// http.Error(w, "title must not be empty", http.StatusBadRequest)
+		// return
+		err := errors.New("title must not be empty")
+		errorRs.Err = err.Error()
+		writeJson(w, http.StatusBadRequest, &errorRs)
+	}
+
+	if err := checkDate(&task); err != nil {
+		// http.Error(w, err.Error(), http.StatusBadRequest)
+		// return
+		errorRs.Err = err.Error()
+		writeJson(w, http.StatusBadRequest, &errorRs)
+		return
+	}
+
+	id, err := db.AddTask(&task)
+	if err != nil {
+		// http.Error(w, err.Error(), http.StatusBadRequest)
+		// return
+		errorRs.Err = err.Error()
+		writeJson(w, http.StatusBadRequest, &errorRs)
+	}
+
+	addTaskRs.Id = strconv.FormatInt(id, 10)
+	// response.Err = err.Error()
+	writeJson(w, http.StatusOK, &addTaskRs)
+
+	// {"id":"186"}
+	// {"error":"Не указан заголовок задачи"}
+	// ошибка десериализации JSON;
+	// не указан заголовок задачи;
+	// дата представлена в формате, отличном от 20060102;
+	// правило повторения указано в неправильном формате
+
+	// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	// w.WriteHeader(http.StatusCreated)
+	// w.Write([]byte(strconv.FormatInt(id, 10)))
+}
+
+func readJson(w http.ResponseWriter, req *http.Request, task *db.Task) {
+	var buf bytes.Buffer
+
+	_, err := buf.ReadFrom(req.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err = json.Unmarshal(buf.Bytes(), &task); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+}
+
+func writeJson(w http.ResponseWriter, status int, data any) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(status)
+
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		http.Error(w, "error encoding JSON", http.StatusInternalServerError)
+	}
+}
+
+func checkDate(task *db.Task) error {
+	now := time.Now()
+	//if task.Date is an empty string then put time.Now() into
+	if len(task.Date) == 0 {
+		task.Date = now.Format(LAYOUT)
+	}
+	// check task.Date for correct format
+	if _, err := time.Parse(LAYOUT, task.Date); err != nil {
+		return err
+	}
+
+	next, err := NextDate(now, task.Date, task.Repeat)
+	if err != nil {
+		return err
+	}
+
+	task.Date = next
+	return nil
+}

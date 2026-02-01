@@ -6,4 +6,12 @@ import (
 
 func Init() {
 	http.HandleFunc("/api/nextdate", nextDayHandler)
+	http.HandleFunc("/api/task", taskHandler)
+}
+
+func taskHandler(w http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case http.MethodPost:
+		addTaskHandler(w, req)
+	}
 }

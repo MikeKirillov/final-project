@@ -36,7 +36,7 @@ func Init(dbFile string) error {
 		fmt.Println(err)
 		return err
 	}
-	defer db.Close()
+	// defer db.Close()
 
 	if install == true {
 		fmt.Println("Creating new schema")

@@ -19,16 +19,18 @@ func nextDayHandler(w http.ResponseWriter, req *http.Request) {
 
 	dateNow, err := time.Parse(LAYOUT, now)
 	if err != nil {
-		http.Error(w, "the value 'now' parsing error "+req.RequestURI, http.StatusNotAcceptable)
+		http.Error(w, "the value 'now' parsing error "+req.RequestURI, http.StatusBadRequest)
 		return
 	}
 
 	result, err := NextDate(dateNow, date, repeat)
 	if err != nil {
-		http.Error(w, err.Error()+req.RequestURI, http.StatusNotAcceptable)
+		http.Error(w, err.Error()+req.RequestURI, http.StatusBadRequest)
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(result))
 }
 
@@ -38,20 +40,23 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	// The rest of the elements are values that are used depending on the repeating type
 	splitedRep := strings.Split(repeat, " ")
 
+	var increasedDate time.Time
+	// using as result even with error because
+	// of https://go.dev/ref/spec#The_zero_value
+	var resultDate string
+
 	// the 'repeat' value check rules
 	err := repChecks(repeat, splitedRep[0])
 	if err != nil {
-		return "", err
+		return resultDate, err
 	}
-
-	var increasedDate time.Time
 
 	// For the year-rule, we check it in this way
 	// or for an array's length that is always equal to 1 in this specific case
 	if splitedRep[0] == "y" {
 		date, err := time.Parse(LAYOUT, dstart)
 		if err != nil {
-			return "", err
+			return resultDate, err
 		}
 
 		increasedDate = date.AddDate(1, 0, 0)
@@ -61,19 +66,21 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 		for increasedDate.Before(now) {
 			increasedDate = increasedDate.AddDate(1, 0, 0)
 		}
+
+		resultDate = increasedDate.Format(LAYOUT)
 	} else {
 		daysCount, err := strconv.Atoi(splitedRep[1])
 		if err != nil {
-			return "", err
+			return resultDate, err
 		}
 
 		if daysCount > DAYS_LIMIT {
-			return "", errors.New("the 'repeat' value contains an interval that exceeds the maximum allowed limit")
+			return resultDate, errors.New("the 'repeat' value contains an interval that exceeds the maximum allowed limit")
 		}
 
 		date, err := time.Parse(LAYOUT, dstart)
 		if err != nil {
-			return "", err
+			return resultDate, err
 		}
 
 		increasedDate = date.AddDate(0, 0, daysCount)
@@ -81,12 +88,14 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 		for increasedDate.Before(now) {
 			increasedDate = increasedDate.AddDate(0, 0, daysCount)
 		}
+
+		resultDate = increasedDate.Format(LAYOUT)
 	}
-	return increasedDate.Format(LAYOUT), nil
+	return resultDate, nil
 }
 
 func repChecks(repeat string, repType string) error {
-	if strings.TrimSpace(repeat) == "" {
+	if len(strings.TrimSpace(repeat)) == 0 {
 		return errors.New("the 'repeat' value can not be an empty string")
 	}
 
