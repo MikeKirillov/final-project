@@ -16,4 +16,6 @@ func main() {
 
 	api.Init()
 	server.Start()
+
+	db.DbClose()
 }

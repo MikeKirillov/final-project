@@ -28,8 +28,6 @@ func addTaskHandler(w http.ResponseWriter, req *http.Request) {
 	readJson(w, req, &task)
 
 	if len(task.Title) == 0 {
-		// http.Error(w, "title must not be empty", http.StatusBadRequest)
-		// return
 		err := errors.New("title must not be empty")
 		errorRs.Err = err.Error()
 		writeJson(w, http.StatusBadRequest, &errorRs)
@@ -43,8 +41,6 @@ func addTaskHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err := checkDate(&task); err != nil {
-		// http.Error(w, err.Error(), http.StatusBadRequest)
-		// return
 		errorRs.Err = err.Error()
 		writeJson(w, http.StatusBadRequest, &errorRs)
 		return
@@ -52,27 +48,13 @@ func addTaskHandler(w http.ResponseWriter, req *http.Request) {
 
 	id, err := db.AddTask(&task)
 	if err != nil {
-		// http.Error(w, err.Error(), http.StatusBadRequest)
-		// return
 		errorRs.Err = err.Error()
 		writeJson(w, http.StatusBadRequest, &errorRs)
 		return
 	}
 
 	addTaskRs.Id = strconv.FormatInt(id, 10)
-	// response.Err = err.Error()
 	writeJson(w, http.StatusOK, &addTaskRs)
-
-	// {"id":"186"}
-	// {"error":"Не указан заголовок задачи"}
-	// ошибка десериализации JSON;
-	// не указан заголовок задачи;
-	// дата представлена в формате, отличном от 20060102;
-	// правило повторения указано в неправильном формате
-
-	// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	// w.WriteHeader(http.StatusCreated)
-	// w.Write([]byte(strconv.FormatInt(id, 10)))
 }
 
 func readJson(w http.ResponseWriter, req *http.Request, task *db.Task) {
@@ -120,7 +102,6 @@ func checkDate(task *db.Task) error {
 			task.Date = nowString
 		}
 	}
-
 	return nil
 }
 

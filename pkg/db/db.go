@@ -52,3 +52,7 @@ func Init(dbFile string) error {
 
 	return nil
 }
+
+func DbClose() {
+	defer db.Close()
+}
