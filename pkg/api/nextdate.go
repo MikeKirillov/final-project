@@ -101,7 +101,7 @@ func repChecks(repeat string, repType string) error {
 
 	repTypes := []string{"y", "d"}
 
-	if !slices.Contains(repTypes, repType) {
+	if len(repType) != 0 && !slices.Contains(repTypes, repType) {
 		return errors.New("the 'repeat' value contains an invalid character")
 	}
 
