@@ -101,26 +101,33 @@ func writeJson(w http.ResponseWriter, status int, data any) {
 
 func checkDate(task *db.Task) error {
 	now := time.Now()
+	nowString := now.Format(LAYOUT)
 	//if task.Date is an empty string then put time.Now() into
 	if len(task.Date) == 0 {
-		task.Date = now.Format(LAYOUT)
+		task.Date = nowString
 	}
 	// check task.Date for correct format
-	if _, err := time.Parse(LAYOUT, task.Date); err != nil {
+	t, err := time.Parse(LAYOUT, task.Date)
+	if err != nil {
 		return err
 	}
 
-	next, err := NextDate(now, task.Date, task.Repeat)
-	if err != nil {
-		// return err
+	if task.Date != nowString && t.Before(now) {
+		if len(task.Repeat) != 0 {
+			next, _ := NextDate(now, task.Date, task.Repeat)
+			task.Date = next
+		} else {
+			task.Date = nowString
+		}
 	}
-	task.Date = next
+
 	return nil
 }
 
 func checkRepeat(task *db.Task) error {
 	splitedRep := strings.Split(task.Repeat, " ")
 	repTypes := []string{"y", "d"}
+
 	if len(splitedRep[0]) != 0 && !slices.Contains(repTypes, splitedRep[0]) {
 		return errors.New("the 'repeat' value contains an invalid character")
 	}
