@@ -6,7 +6,9 @@ import (
 	"errors"
 	"final-project/pkg/db"
 	"net/http"
+	"slices"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -29,6 +31,12 @@ func addTaskHandler(w http.ResponseWriter, req *http.Request) {
 		// http.Error(w, "title must not be empty", http.StatusBadRequest)
 		// return
 		err := errors.New("title must not be empty")
+		errorRs.Err = err.Error()
+		writeJson(w, http.StatusBadRequest, &errorRs)
+		return
+	}
+
+	if err := checkRepeat(&task); err != nil {
 		errorRs.Err = err.Error()
 		writeJson(w, http.StatusBadRequest, &errorRs)
 		return
@@ -101,27 +109,20 @@ func checkDate(task *db.Task) error {
 	if _, err := time.Parse(LAYOUT, task.Date); err != nil {
 		return err
 	}
-	// t, err := time.Parse(LAYOUT, task.Date)
-	// if err != nil {
-	// 	return err
-	// }
 
 	next, err := NextDate(now, task.Date, task.Repeat)
 	if err != nil {
-		return err
+		// return err
 	}
 	task.Date = next
 	return nil
+}
 
-	// next, err := NextDate(now, task.Date, task.Repeat)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// if t.Before(now) {
-	// 	if len(task.Repeat) != 0 {
-	// 		task.Date = next
-	// 	}
-	// }
-	// return nil
+func checkRepeat(task *db.Task) error {
+	splitedRep := strings.Split(task.Repeat, " ")
+	repTypes := []string{"y", "d"}
+	if len(splitedRep[0]) != 0 && !slices.Contains(repTypes, splitedRep[0]) {
+		return errors.New("the 'repeat' value contains an invalid character")
+	}
+	return nil
 }
