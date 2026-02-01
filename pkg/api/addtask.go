@@ -31,6 +31,7 @@ func addTaskHandler(w http.ResponseWriter, req *http.Request) {
 		err := errors.New("title must not be empty")
 		errorRs.Err = err.Error()
 		writeJson(w, http.StatusBadRequest, &errorRs)
+		return
 	}
 
 	if err := checkDate(&task); err != nil {
@@ -47,6 +48,7 @@ func addTaskHandler(w http.ResponseWriter, req *http.Request) {
 		// return
 		errorRs.Err = err.Error()
 		writeJson(w, http.StatusBadRequest, &errorRs)
+		return
 	}
 
 	addTaskRs.Id = strconv.FormatInt(id, 10)
