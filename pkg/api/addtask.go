@@ -101,12 +101,27 @@ func checkDate(task *db.Task) error {
 	if _, err := time.Parse(LAYOUT, task.Date); err != nil {
 		return err
 	}
+	// t, err := time.Parse(LAYOUT, task.Date)
+	// if err != nil {
+	// 	return err
+	// }
 
 	next, err := NextDate(now, task.Date, task.Repeat)
 	if err != nil {
 		return err
 	}
-
 	task.Date = next
 	return nil
+
+	// next, err := NextDate(now, task.Date, task.Repeat)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// if t.Before(now) {
+	// 	if len(task.Repeat) != 0 {
+	// 		task.Date = next
+	// 	}
+	// }
+	// return nil
 }
