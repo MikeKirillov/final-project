@@ -40,7 +40,6 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	// The rest of the elements are values that are used depending on the repeating type
 	splitedRep := strings.Split(repeat, " ")
 
-	var increasedDate time.Time
 	// using as result even with error because
 	// of https://go.dev/ref/spec#The_zero_value
 	var resultDate string
@@ -51,23 +50,22 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 		return resultDate, err
 	}
 
+	date, err := time.Parse(LAYOUT, dstart)
+	if err != nil {
+		return resultDate, err
+	}
+
 	// For the year-rule, we check it in this way
 	// or for an array's length that is always equal to 1 in this specific case
 	if splitedRep[0] == "y" {
-		date, err := time.Parse(LAYOUT, dstart)
-		if err != nil {
-			return resultDate, err
-		}
-
-		increasedDate = date.AddDate(1, 0, 0)
+		date = date.AddDate(1, 0, 0)
 		// The returned date must be greater than the date specified in the 'now' variable.
 		// In simpler terms, when searching for the next date, you should start counting from
 		// 'dstart' and repeat intervals until the date becomes greater than 'now'
-		for increasedDate.Before(now) {
-			increasedDate = increasedDate.AddDate(1, 0, 0)
+		for date.Before(now) {
+			date = date.AddDate(1, 0, 0)
 		}
-
-		resultDate = increasedDate.Format(LAYOUT)
+		resultDate = date.Format(LAYOUT)
 	} else {
 		daysCount, err := strconv.Atoi(splitedRep[1])
 		if err != nil {
@@ -78,18 +76,12 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 			return resultDate, errors.New("the 'repeat' value contains an interval that exceeds the maximum allowed limit")
 		}
 
-		date, err := time.Parse(LAYOUT, dstart)
-		if err != nil {
-			return resultDate, err
-		}
-
-		increasedDate = date.AddDate(0, 0, daysCount)
+		date = date.AddDate(0, 0, daysCount)
 		// same check for 'increasedDate < now'
-		for increasedDate.Before(now) {
-			increasedDate = increasedDate.AddDate(0, 0, daysCount)
+		for date.Before(now) {
+			date = date.AddDate(0, 0, daysCount)
 		}
-
-		resultDate = increasedDate.Format(LAYOUT)
+		resultDate = date.Format(LAYOUT)
 	}
 	return resultDate, nil
 }
