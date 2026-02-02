@@ -18,23 +18,23 @@ func addTaskHandler(w http.ResponseWriter, req *http.Request) {
 
 	if len(task.Title) == 0 {
 		err := errors.New("title must not be empty")
-		writeJson(w, http.StatusBadRequest, err.Error())
+		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
 	if err := checkRepeat(&task); err != nil {
-		writeJson(w, http.StatusBadRequest, err.Error())
+		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
 	if err := checkDate(&task); err != nil {
-		writeJson(w, http.StatusBadRequest, err.Error())
+		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
 	id, err := db.AddTask(&task)
 	if err != nil {
-		writeJson(w, http.StatusBadRequest, err.Error())
+		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	writeJson(w, http.StatusOK, strconv.FormatInt(id, 10))
+	writeJson(w, http.StatusOK, map[string]string{"id": strconv.FormatInt(id, 10)})
 }
 
 func readJson(w http.ResponseWriter, req *http.Request, task *db.Task) {
@@ -51,18 +51,11 @@ func readJson(w http.ResponseWriter, req *http.Request, task *db.Task) {
 	}
 }
 
-func writeJson(w http.ResponseWriter, status int, data string) {
+func writeJson(w http.ResponseWriter, status int, data any) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(status)
 
-	responsMap := make(map[string]string)
-
-	if status == http.StatusOK {
-		responsMap["id"] = data
-	} else {
-		responsMap["error"] = data
-	}
-	if err := json.NewEncoder(w).Encode(responsMap); err != nil {
+	if err := json.NewEncoder(w).Encode(data); err != nil {
 		http.Error(w, "error encoding JSON", http.StatusInternalServerError)
 	}
 }
