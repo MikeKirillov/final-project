@@ -65,7 +65,7 @@ func Tasks(limit int) ([]*Task, error) {
 		log.Println(err)
 		return tasks, nil
 	}
-	// to avoid responce like {"tasks":null}, it's better to create an empty slice
+	// to avoid responce like {"tasks":null}, it's better to create an empty slice: {"tasks":[]}
 	if tasks == nil {
 		tasks = []*Task{}
 	}
