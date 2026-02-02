@@ -1,12 +1,12 @@
 package server
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 )
 
 func Start() {
-	fmt.Println("Starting server")
+	log.Println("Starting server")
 
 	webDir := "./web"
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
@@ -16,5 +16,5 @@ func Start() {
 		panic(err)
 	}
 
-	fmt.Println("Stop working")
+	log.Println("Stop working")
 }

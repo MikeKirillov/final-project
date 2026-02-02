@@ -1,6 +1,9 @@
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+	"log"
+)
 
 type Task struct {
 	ID      string `json:"id"`
@@ -25,7 +28,20 @@ func AddTask(task *Task) (int64, error) {
 	if err == nil {
 		id, err = res.LastInsertId()
 	}
+	if err != nil {
+		log.Println(err)
+	}
 	// if err != nil, then id returns as '0' because
 	// of https://go.dev/ref/spec#The_zero_value
 	return id, err
+}
+
+func Tasks(limit int) ([]*Task, error) {
+	// rows, err := db.Query("")
+	// if err != nil {
+	// 	log.Println(err)
+	// 	return nil, err
+	// }
+
+	return nil, nil
 }

@@ -2,7 +2,7 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 	"os"
 
 	_ "modernc.org/sqlite"
@@ -21,33 +21,33 @@ CREATE INDEX scheduler_date ON scheduler (date);`
 var db *sql.DB
 
 func Init(dbFile string) error {
-	fmt.Println("DB initialization")
+	log.Println("DB initialization")
 
 	_, err := os.Stat(dbFile)
 
 	var install bool
 	if err != nil {
-		fmt.Println("There's no file")
+		log.Println("There's no file")
 		install = true
 	}
 
 	db, err = sql.Open("sqlite", dbFile)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return err
 	}
 	// defer db.Close()
 
 	if install == true {
-		fmt.Println("Creating new schema")
+		log.Println("Creating new schema")
 
 		_, err = db.Exec(schema)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return err
 		}
 
-		fmt.Println("Table 'scheduler' created successfully (if it did not already exist)")
+		log.Println("Table 'scheduler' created successfully (if it did not already exist)")
 	}
 
 	return nil

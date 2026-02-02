@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"final-project/pkg/db"
+	"log"
 	"net/http"
 	"slices"
 	"strconv"
@@ -18,19 +19,23 @@ func addTaskHandler(w http.ResponseWriter, req *http.Request) {
 
 	if len(task.Title) == 0 {
 		err := errors.New("title must not be empty")
+		log.Println(err)
 		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
 	if err := checkRepeat(&task); err != nil {
+		log.Println(err)
 		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
 	if err := checkDate(&task); err != nil {
+		log.Println(err)
 		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
 	id, err := db.AddTask(&task)
 	if err != nil {
+		log.Println(err)
 		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
@@ -42,10 +47,12 @@ func readJson(w http.ResponseWriter, req *http.Request, task *db.Task) {
 
 	_, err := buf.ReadFrom(req.Body)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if err = json.Unmarshal(buf.Bytes(), &task); err != nil {
+		log.Println(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -56,6 +63,7 @@ func writeJson(w http.ResponseWriter, status int, data any) {
 	w.WriteHeader(status)
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
+		log.Println(err)
 		http.Error(w, "error encoding JSON", http.StatusInternalServerError)
 	}
 }
@@ -70,6 +78,7 @@ func checkDate(task *db.Task) error {
 	// check task.Date for correct format
 	t, err := time.Parse(LAYOUT, task.Date)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 
@@ -89,7 +98,9 @@ func checkRepeat(task *db.Task) error {
 	repTypes := []string{"y", "d"}
 
 	if len(splitedRep[0]) != 0 && !slices.Contains(repTypes, splitedRep[0]) {
-		return errors.New("the 'repeat' value contains an invalid character")
+		err := errors.New("the 'repeat' value contains an invalid character")
+		log.Println(err)
+		return err
 	}
 	return nil
 }
