@@ -3,7 +3,13 @@
 
 Директория `web` содержит файлы фронтенда.
 
-add task POST call example:
+# Call examples
+/api/nextdate GET call:
+```
+curl "http://localhost:7540/api/nextdate?now=20250126&date=20250126&repeat=y"
+```
+
+add task POST call:
 ```
 curl -X POST http://localhost:7540/api/task \
 -H "Content-Type: application/json" \
