@@ -45,7 +45,7 @@ func Tasks(limit int) ([]*Task, error) {
 	rows, err := db.Query(SELECT_BY_LIMIT, limit)
 	if err != nil {
 		log.Println(err)
-		return nil, err
+		return tasks, err
 	}
 	defer rows.Close()
 
@@ -61,5 +61,12 @@ func Tasks(limit int) ([]*Task, error) {
 		tasks = append(tasks, &task)
 	}
 
+	if err := rows.Err(); err != nil {
+		log.Println(err)
+		return tasks, nil
+	}
+	if tasks == nil {
+		tasks = []*Task{}
+	}
 	return tasks, nil
 }
