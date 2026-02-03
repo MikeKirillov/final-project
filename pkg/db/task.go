@@ -27,7 +27,7 @@ const UPDATE_ROW = `
 UPDATE scheduler SET date = :date, title = :title, comment = :comment, repeat = :repeat WHERE id = :id`
 
 const DELETE_BY_ID = `
-DELETE FROM cheduler WHERE id = :id`
+DELETE FROM scheduler WHERE id = :id`
 
 func AddTask(task *Task) (int64, error) {
 	var id int64
@@ -107,10 +107,6 @@ func UpdateTask(task *Task) error {
 		return fmt.Errorf("incorrect id for updating task")
 	}
 
-	return nil
-}
-
-func UpdateTaskDone(id string) error {
 	return nil
 }
 

@@ -27,3 +27,13 @@ $ curl -X PUT http://localhost:7540/api/task \
 -H "Content-Type: application/json" \
 -d '{"id":"204","date":"20240201","title":"some title","comment":"some comment","repeat":"y"}'
 ```
+
+/api/task?id=... DELETE call:
+```
+$ curl -X DELETE http://localhost:7540/api/task?id=230
+```
+
+/api/task/done?id=... POST call:
+```
+$ curl -X POST http://localhost:7540/api/task/done?id=230
+```

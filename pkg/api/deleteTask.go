@@ -16,11 +16,20 @@ func deleteTaskHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err := db.DeleteTask(id)
+	_, err := db.GetTask(id)
+	// returns error if there's no rows by id: 'sql: no rows in result set'
 	if err != nil {
 		log.Println(err)
-		writeJson(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
 	}
 
-	writeJson(w, http.StatusOK, db.Task{})
+	err = db.DeleteTask(id)
+	if err != nil {
+		log.Println(err)
+		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
+
+	writeJson(w, http.StatusOK, struct{}{})
 }

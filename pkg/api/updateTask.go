@@ -34,5 +34,5 @@ func updateTaskHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	writeJson(w, http.StatusOK, db.Task{})
+	writeJson(w, http.StatusOK, struct{}{})
 }
