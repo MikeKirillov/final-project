@@ -86,6 +86,7 @@ func GetTask(id string) (*Task, error) {
 
 func UpdateTask(task *Task) error {
 	res, err := db.Exec(UPDATE_ROW,
+		sql.Named("id", task.ID),
 		sql.Named("date", task.Date),
 		sql.Named("title", task.Title),
 		sql.Named("comment", task.Comment),

@@ -27,6 +27,12 @@ func updateTaskHandler(w http.ResponseWriter, req *http.Request) {
 		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
+	err := db.UpdateTask(&task)
+	if err != nil {
+		log.Println(err)
+		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
 
 	writeJson(w, http.StatusOK, db.Task{})
 }
