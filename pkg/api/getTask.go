@@ -15,6 +15,7 @@ func getTaskHandler(w http.ResponseWriter, req *http.Request) {
 		err := errors.New("id must be specified")
 		log.Println(err)
 		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
 	}
 
 	task, err := db.GetTask(id)
@@ -22,6 +23,7 @@ func getTaskHandler(w http.ResponseWriter, req *http.Request) {
 		err := errors.New("task is not found")
 		log.Println(err)
 		writeJson(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		return
 	}
 
 	writeJson(w, http.StatusOK, task)
