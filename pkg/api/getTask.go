@@ -19,6 +19,7 @@ func getTaskHandler(w http.ResponseWriter, req *http.Request) {
 
 	task, err := db.GetTask(id)
 	if err != nil && err == sql.ErrNoRows {
+		err := errors.New("task is not found")
 		log.Println(err)
 		writeJson(w, http.StatusNotFound, map[string]string{"error": err.Error()})
 	}

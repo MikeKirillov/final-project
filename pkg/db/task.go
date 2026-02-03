@@ -2,7 +2,7 @@ package db
 
 import (
 	"database/sql"
-	"log"
+	"fmt"
 )
 
 type Task struct {
@@ -23,6 +23,9 @@ SELECT * FROM scheduler ORDER BY date LIMIT ?`
 const SELECT_BY_ID = `
 SELECT * FROM scheduler WHERE id = :id`
 
+const UPDATE_ROW = `
+UPDATE scheduler SET date = :date, title = :title, comment = :comment, repeat = :repeat WHERE id = :id`
+
 func AddTask(task *Task) (int64, error) {
 	var id int64
 
@@ -34,9 +37,6 @@ func AddTask(task *Task) (int64, error) {
 	if err == nil {
 		id, err = res.LastInsertId()
 	}
-	if err != nil {
-		log.Println(err)
-	}
 	// if err != nil, then id returns as '0' because
 	// of https://go.dev/ref/spec#The_zero_value
 	return id, err
@@ -47,7 +47,6 @@ func Tasks(limit int) ([]*Task, error) {
 
 	rows, err := db.Query(SELECT_BY_LIMIT, limit)
 	if err != nil {
-		log.Println(err)
 		return tasks, err
 	}
 	defer rows.Close()
@@ -57,7 +56,6 @@ func Tasks(limit int) ([]*Task, error) {
 
 		err := rows.Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
 		if err != nil {
-			log.Println(err)
 			return tasks, err
 		}
 
@@ -65,7 +63,6 @@ func Tasks(limit int) ([]*Task, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Println(err)
 		return tasks, nil
 	}
 	// to avoid responce like {"tasks":null}, it's better to create an empty slice: {"tasks":[]}
@@ -81,9 +78,30 @@ func GetTask(id string) (*Task, error) {
 	row := db.QueryRow(SELECT_BY_ID, sql.Named("id", id))
 	err := row.Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
 	return &task, nil
+}
+
+func UpdateTask(task *Task) error {
+	res, err := db.Exec(UPDATE_ROW,
+		sql.Named("date", task.Date),
+		sql.Named("title", task.Title),
+		sql.Named("comment", task.Comment),
+		sql.Named("repeat", task.Repeat))
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected() // returns count of updated rows
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return fmt.Errorf("incorrect id for updating task")
+	}
+
+	return nil
 }
