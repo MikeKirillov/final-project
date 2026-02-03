@@ -20,6 +20,9 @@ INSERT INTO scheduler (date, title, comment, repeat)
 const SELECT_BY_LIMIT = `
 SELECT * FROM scheduler ORDER BY date LIMIT ?`
 
+const SELECT_BY_ID = `
+SELECT * FROM scheduler WHERE id = :id`
+
 func AddTask(task *Task) (int64, error) {
 	var id int64
 
@@ -70,4 +73,17 @@ func Tasks(limit int) ([]*Task, error) {
 		tasks = []*Task{}
 	}
 	return tasks, nil
+}
+
+func GetTask(id string) (*Task, error) {
+	var task = Task{}
+
+	row := db.QueryRow(SELECT_BY_ID, sql.Named("id", id))
+	err := row.Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &task, nil
 }
