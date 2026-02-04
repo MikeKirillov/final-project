@@ -1,10 +1,10 @@
 package main
 
 import (
-	"final-project/pkg/api"
 	"final-project/pkg/db"
 	"final-project/pkg/server"
 	"log"
+	"net/http"
 )
 
 func main() {
@@ -14,8 +14,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	api.Init()
-	server.Start()
+	log.Println("Starting server")
 
-	db.DbClose()
+	webDir := "./web"
+	http.Handle("/", http.FileServer(http.Dir(webDir)))
+
+	server.Run()
+
+	err = http.ListenAndServe(":7540", nil)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println("Stop working")
 }
