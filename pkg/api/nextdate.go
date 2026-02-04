@@ -23,15 +23,14 @@ func nextDayHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	result, err := NextDate(dateNow, date, repeat)
-	if err != nil {
+	if result, err := NextDate(dateNow, date, repeat); err != nil {
 		http.Error(w, err.Error()+req.RequestURI, http.StatusBadRequest)
 		return
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(result))
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(result))
 }
 
 func NextDate(now time.Time, dstart string, repeat string) (string, error) {

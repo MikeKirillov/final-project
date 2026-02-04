@@ -24,12 +24,11 @@ func deleteTaskHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = db.DeleteTask(id)
-	if err != nil {
+	if err = db.DeleteTask(id); err != nil {
 		log.Println(err)
 		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
+	} else {
+		writeJson(w, http.StatusOK, struct{}{})
 	}
-
-	writeJson(w, http.StatusOK, struct{}{})
 }

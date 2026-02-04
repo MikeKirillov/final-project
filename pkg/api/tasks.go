@@ -11,11 +11,11 @@ type TasksResp struct {
 }
 
 func tasksHandler(w http.ResponseWriter, req *http.Request) {
-	tasks, err := db.Tasks(50) // max limit = 50
-	if err != nil {
+	if tasks, err := db.Tasks(50); err != nil {
 		log.Println(err)
 		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
+	} else {
+		writeJson(w, http.StatusOK, TasksResp{Tasks: tasks})
 	}
-	writeJson(w, http.StatusOK, TasksResp{Tasks: tasks})
 }

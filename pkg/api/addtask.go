@@ -28,11 +28,12 @@ func addTaskHandler(w http.ResponseWriter, req *http.Request) {
 		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
 	}
-	id, err := db.AddTask(&task)
-	if err != nil {
+
+	if id, err := db.AddTask(&task); err != nil {
 		log.Println(err)
 		writeJson(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 		return
+	} else {
+		writeJson(w, http.StatusOK, map[string]string{"id": strconv.FormatInt(id, 10)})
 	}
-	writeJson(w, http.StatusOK, map[string]string{"id": strconv.FormatInt(id, 10)})
 }
