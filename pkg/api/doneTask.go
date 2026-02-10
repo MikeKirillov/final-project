@@ -2,11 +2,12 @@ package api
 
 import (
 	"errors"
-	"final-project/pkg/db"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"final-project/pkg/db"
 )
 
 func doneTaskHandler(w http.ResponseWriter, req *http.Request) {

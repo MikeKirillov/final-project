@@ -34,9 +34,9 @@ func Init(dbFile string) error {
 	db, err = sql.Open("sqlite", dbFile)
 	if err != nil {
 		log.Println(err)
+		defer db.Close()
 		return err
 	}
-	// defer db.Close()
 
 	if install == true {
 		log.Println("Creating new schema")
@@ -44,6 +44,7 @@ func Init(dbFile string) error {
 		_, err = db.Exec(schema)
 		if err != nil {
 			log.Println(err)
+			defer db.Close()
 			return err
 		}
 
@@ -53,6 +54,6 @@ func Init(dbFile string) error {
 	return nil
 }
 
-func DbClose() {
+func Close() {
 	defer db.Close()
 }

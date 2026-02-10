@@ -3,9 +3,10 @@ package api
 import (
 	"database/sql"
 	"errors"
-	"final-project/pkg/db"
 	"log"
 	"net/http"
+
+	"final-project/pkg/db"
 )
 
 func getTaskHandler(w http.ResponseWriter, req *http.Request) {

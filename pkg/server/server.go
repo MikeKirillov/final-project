@@ -1,23 +1,24 @@
 package server
 
 import (
-	"final-project/pkg/api"
 	"log"
 	"net/http"
+
+	"final-project/pkg/api"
 )
 
+const port = ":7540"
+
 func Run() {
-	log.Println("Starting server")
+	log.Printf("Starting server on port %v\n", port)
 
 	webDir := "./web"
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
 
 	api.Init()
 
-	err := http.ListenAndServe(":7540", nil)
+	err := http.ListenAndServe(port, nil)
 	if err != nil {
 		panic(err)
 	}
-
-	log.Println("Stop working")
 }

@@ -2,10 +2,11 @@ package api
 
 import (
 	"errors"
-	"final-project/pkg/db"
 	"log"
 	"net/http"
 	"strconv"
+
+	"final-project/pkg/db"
 )
 
 func addTaskHandler(w http.ResponseWriter, req *http.Request) {

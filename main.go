@@ -1,10 +1,11 @@
 package main
 
 import (
-	"final-project/pkg/db"
-	"final-project/pkg/server"
 	"log"
 	"os"
+
+	"final-project/pkg/db"
+	"final-project/pkg/server"
 )
 
 const TODO_PORT = "TODO_PORT"
@@ -22,4 +23,5 @@ func main() {
 	}
 
 	server.Run()
+	db.Close()
 }
